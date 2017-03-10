@@ -10,7 +10,7 @@ import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
 
-public class Main {
+public class TestMain {
 
     //Constants
     public static final int ID_NOT_SPECIFIED = -1;
@@ -99,7 +99,7 @@ public class Main {
             stmt.executeUpdate(SQL);
         } catch (SQLException ex) {
             System.out.println("Could not create workout");
-            printExeption(ex);
+            System.out.println(ex.toString());
         }
 
     }

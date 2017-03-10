@@ -12,7 +12,7 @@ import java.util.Scanner;
 
 public class Main {
 
-    public static void createInstance {
+    public static void createInstance() {
 
         try {
             // The newInstance() call is a work around for some
@@ -26,11 +26,16 @@ public class Main {
 
     }
 
-    public static Connection createConnection {
+    public static Connection createConnection() {
+
+        String dbURL = "jdbc:mysql://localhost:3306/espenespen?useSSL=false";
+        String username = "root";
+        String password = "passord";
+
 
         try {
             System.out.println("Database connected");
-            return DriverManager.getConnection("jdbc:mysql://localhost/espenespen?" + "user=root&password=" + System.getenv("DTD4145_SERVER_PASSWORD"));
+            return DriverManager.getConnection(dbURL, username, password);
         } catch (SQLException ex) {
             System.out.println("Failed to connect to DB");
             printException(ex);
@@ -59,26 +64,17 @@ public class Main {
         //Bugfix
         reader.nextLine();
 
-        System.out.println("Tast inn navn på treningen ");
-        String name = reader.nextLine();
-
-        System.out.println("Tast inn tid (Format: 2017-03-15 18:00:00)");
+        System.out.println("Tast inn dato og tid til økten (Format: 2017-03-15 18:00:00)");
         String time = reader.nextLine();
 
-        System.out.println("Tast inn varighet i timer (Format: 2017-03-15 18:00:00)");
+        System.out.println("Tast inn Økt-ID nr");
+        int oktid = reader.nextInt();
+
+        System.out.println("Tast inn varighet i timer (Format: 18:00:00)");
         String duration = reader.nextLine();
 
-        System.out.println("Er treningen en mal? (Nei: 0, Ja:1)");
-        int template = reader.nextInt();
-
-        System.out.println("Er treningen inne eller ute? (Inne: " + WORKOUT_INDOOR + ", ute: " + WORKOUT_OUTDOOR + ")");
-        int type = reader.nextInt();
-
-        String SQL = ("INSERT INTO `espenespen`.`treningsokt` (`dato`, `oktid`, `varighet`, `prestasjon`) values ('" + dato + "', '" + oktid + "', " + varighet + ", " + prestasjon + ")");
-        //System.out.println(SQL);
-
-        c VALUES ('2017-03-15 20:00:00', '2', '01:00:00', '3');
-
+        String SQL = ("INSERT INTO `espenespen`.`treningsokt` (`dato`, `oktid`, `varighet`) values ('" + time + "', " + oktid + ", '" + duration + "')");
+        //System.out.println(SQL)
 
         try {
             System.out.println("Opprettet trening");
@@ -88,6 +84,22 @@ public class Main {
             printException(ex);
         }
 
+    }
+
+    public static void printMenu() {
+        System.out.println("-------------------");
+        System.out.println("Velg et alternativ:");
+        System.out.println("2) Skriv ut treninger");
+        System.out.println("3) Skriv ut øvelser");
+        System.out.println("4) Skriv ut resultater");
+        System.out.println("5) Skriv ut kategorier");
+        System.out.println("6) Skriv ut mål");
+        System.out.println("8) Opprett ny trening");
+        System.out.println("9) Opprett ny øvelse");
+        System.out.println("10) Opprett nytt resultat");
+        System.out.println("11) Opprett ny kategori");
+        System.out.println("13) Generer rapport");
+        System.out.println("14) Generer statistikk");
     }
 
     public static void main(String[] args) {
@@ -100,11 +112,12 @@ public class Main {
         createInstance();
         Connection conn = createConnection();
         Statement stmt = createStatement(conn);
-
-        SELECT varighet FROM espenespen.treningsokt where oktid = 1;
-
-        String i = stmt.executeQuery("SELECT varighet FROM espenespen.treningsokt where oktid = 1");
-        System.out.println(i);
+        try {
+            stmt.execute("SELECT varighet FROM espenespen.treningsokt where oktid = 1");
+            System.out.println("works");
+        } catch (SQLException e) {
+            System.out.println("Rip");
+        }
     }
 
     //Extra functions
