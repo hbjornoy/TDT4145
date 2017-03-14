@@ -220,6 +220,7 @@ public class Main {
             System.out.println("Opprettet øvelse");
         } catch (SQLException ex) {
             System.out.println("Kunne ikke opprette øvelse");
+            System.out.println("Sjekk at muskelgruppen ligger i databasen");
             printException(ex);
         }
 
