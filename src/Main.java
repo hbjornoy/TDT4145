@@ -23,9 +23,9 @@ public class Main {
 
     public static Connection createConnection() {
 
-        String dbURL = "jdbc:mysql://localhost:3306/Datdat?useSSL=false";
+        String dbURL = "jdbc:mysql://localhost:3306/espenespen?useSSL=false";
         String username = "root";
-        String password = "Eol1234";
+        String password = "passord";
 
 
         try {
@@ -154,48 +154,6 @@ public class Main {
 
     }
 
-    public static void createOvelse(Statement stmt, Scanner reader){
-
-        //Bugfix
-        reader.nextLine();
-
-        System.out.println("Tast inn navn på øvelsen");
-        String name = reader.nextLine();
-
-        System.out.println("Hvilken type er øvelsen? (Styrke/Kondisjon)");
-        int type = reader.nextInt();
-
-        String SQL = ("INSERT INTO ovelse (ovelsenavn, treningstype) values ('" + name + "', " + type + ")");
-        //System.out.println(SQL);
-
-        try {
-            System.out.println("Opprettet øvelse");
-            stmt.executeUpdate(SQL);
-        } catch (SQLException ex) {
-            System.out.println("Kunne ikke opprette øvelse");
-            printException(ex);
-        }
-
-    }
-
-    public static void printOvelse(ResultSet ovelse) {
-        int count = 0;
-        try {
-            System.out.println("Printing workouts");
-            while (ovelse.next()) {
-                ++count;
-                System.out.println(ovelse.getString("ovelsenavn") + " - " + ovelse.getString("treningstype") + " - ");
-            }
-            if (count == 0) {
-                System.out.println("Ingen øvelser funnet");
-            }
-
-        } catch (SQLException ex) {
-            System.out.println("Could not print workouts");
-            printException(ex);
-        }
-    }
-
     public static ResultSet getData(Statement stmt){
         try {
             return stmt.executeQuery("SELECT * FROM data");
@@ -216,7 +174,7 @@ public class Main {
                         " ----- Time: " + data.getTimestamp("tid") +
                         " ----- Puls: " + data.getInt("puls") +
                         " ----- Longitude, latitude and MASL: " + data.getInt("lengdegrad") + ",  " +
-                                data.getInt("breddegrad") + ",  " + data.getInt("hoydeOverHavet")
+                        data.getInt("breddegrad") + ",  " + data.getInt("hoydeOverHavet")
                 );
             }
             if (count == 0) {
@@ -229,18 +187,80 @@ public class Main {
         }
     }
 
+    public static void createOvelse(Statement stmt, Scanner reader){
+
+        //Bugfix
+        reader.nextLine();
+        boolean correct = false;
+
+        System.out.println("Tast inn navn på øvelsen");
+        String name = reader.nextLine().trim();
+
+        System.out.println("Hvilken type er øvelsen? (styrke/kondisjon)");
+        String type = "";
+        while (!correct) {
+            type = reader.nextLine().trim();
+            if (type.equals("styrke") || type.equals("kondisjon")) {
+                correct = true;
+            }
+            else {
+                System.out.println("Hvilken type er øvelsen? (øvelsen må være styrke eller kondisjon..)");
+            }
+        }
+
+        String SQL = ("INSERT INTO ovelse (ovelsenavn, treningstype) values ('" + name + "', '" + type + "')");
+        //System.out.println(SQL);
+
+        try {
+            System.out.println("Opprettet øvelse");
+            stmt.executeUpdate(SQL);
+        } catch (SQLException ex) {
+            System.out.println("Kunne ikke opprette øvelse");
+            printException(ex);
+        }
+
+    }
+
+    public static ResultSet getOvelse(Statement stmt){
+        try {
+            return stmt.executeQuery("SELECT * FROM ovelse");
+        } catch (SQLException ex) {
+            System.out.println("Could not fetch ovelse");
+            printException(ex);
+        }
+        return null;
+    }
+
+    public static void printOvelse(ResultSet ovelse) {
+        int count = 0;
+        try {
+            System.out.println("Printing workouts");
+            while (ovelse.next()) {
+                ++count;
+                System.out.println(ovelse.getString("ovelsenavn") + " - " + ovelse.getString("treningstype") + " - ");
+            }
+            if (count == 0) {
+                System.out.println("Ingen øvelser funnet");
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("Could not print workouts");
+            printException(ex);
+        }
+    }
+
     public static void printMenu() {
         System.out.println("-------------------");
         System.out.println("Velg et alternativ:");
         System.out.println("1) Skriv ut treninger");
         System.out.println("2) Skriv ut data(puls osv)"); // kan få til å spørre om oktid osv
-        //System.out.println("2) Skriv ut øvelser");
+        System.out.println("3) Skriv ut øvelser");
         //System.out.println("3) Skriv ut resultater");
         //System.out.println("4) Skriv ut kategorier");
         //System.out.println("5) Skriv ut mål");
         System.out.println("6) Opprett ny trening");
         System.out.println("7) Opprett ny data(pusl osv)");
-        //System.out.println("7) Opprett ny øvelse");
+        System.out.println("8) Opprett ny øvelse");
         //System.out.println("8) Opprett nytt resultat");
         //System.out.println("9) Opprett ny kategori");
         // System.out.println("10) Generer rapport");
@@ -274,11 +294,17 @@ public class Main {
                     case 2:
                         printData(getData(stmt));
                         break;
+                    case 3:
+                        printOvelse(getOvelse(stmt));
+                        break;
                     case 6:
                         createWorkout(stmt, reader);
                         break;
                     case 7:
                         createData(stmt, reader);
+                        break;
+                    case 8:
+                        createOvelse(stmt, reader);
                         break;
                     default:
                         System.out.println("Ugyldig handling");
