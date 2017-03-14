@@ -163,14 +163,14 @@ public class Main {
         String name = reader.nextLine();
 
         System.out.println("Hvilken type er øvelsen? (Styrke/Kondisjon)");
-        int type = reader.nextInt();
+        String type = reader.nextLine();
 
-        String SQL = ("INSERT INTO ovelse (ovelsenavn, treningstype) values ('" + name + "', " + type + ")");
+        String SQL = ("INSERT INTO ovelse(ovelsenavn, treningstype) values ('" + name + "', " + type + ")");
         //System.out.println(SQL);
 
         try {
-            System.out.println("Opprettet øvelse");
             stmt.executeUpdate(SQL);
+            System.out.println("Opprettet øvelse");
         } catch (SQLException ex) {
             System.out.println("Kunne ikke opprette øvelse");
             printException(ex);
@@ -261,33 +261,19 @@ public class Main {
         createInstance();
         Connection conn = createConnection();
         Statement stmt = createStatement(conn);
+
         
         try {
-            while (active) {
-                printMenu();
-                int alternative = reader.nextInt();
-                System.out.println("----------------------------");
-                switch(alternative){
-                    case 1:
-                        printWorkouts(getWorkouts(stmt));
-                        break;
-                    case 2:
-                        printData(getData(stmt));
-                        break;
-                    case 6:
-                        createWorkout(stmt, reader);
-                        break;
-                    case 7:
-                        createData(stmt, reader);
-                        break;
-                    default:
-                        System.out.println("Ugyldig handling");
-
-                }
-            }
+                ResultSet rs = stmt.executeQuery("SELECT * FROM Datdat.ovelse");
+                printOvelse(rs);
+                createOvelse(stmt, reader);
+                System.out.println("Select * FROM Datdat.ovelse");
+                System.out.println(rs.toString());
+                System.out.println("works");
 
         } catch (Exception e) {
             System.out.println("Rip");
+
         }
     }
 
