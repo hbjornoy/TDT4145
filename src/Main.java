@@ -1,3 +1,5 @@
+import com.sun.org.apache.bcel.internal.generic.Select;
+
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Scanner;
@@ -187,6 +189,54 @@ public class Main {
         }
     }
 
+    public static void createGruppe(Statement stmt, Scanner reader, ResultSet gruppe){
+        int count = 0;
+        reader.nextLine();
+
+        System.out.println("Tast inn navn på muskelgruppen");
+        String muskelgruppe = reader.nextLine().trim();
+
+        try {
+            System.out.println("Printing workouts");
+            while (gruppe.next()) {
+                ++count;
+                System.out.println(gruppe.getString("gruppenavn") + " - ");
+                if ((gruppe.getString("gruppenavn").equals(muskelgruppe))){
+                    System.out.println("Hva er foreldregruppen til muskelgruppen?");
+                    String foreldre = reader.nextLine().trim();
+                    String SQL = ("INSERT INTO gruppe (gruppenavn, foreldregruppe) values ('" + muskelgruppe + "', '" + foreldre + "')");
+
+                    try {
+                        stmt.executeUpdate(SQL);
+                        System.out.println("Opprettet muskelgruppe");
+                    } catch (SQLException ex) {
+                        System.out.println("Kunne ikke opprette muskelgruppe");
+                        printException(ex);
+                    }
+                } else {
+                    String SQL = ("INSERT INTO gruppe (gruppenavn) values ('" + muskelgruppe + "')");
+
+                    try {
+                        stmt.executeUpdate(SQL);
+                        System.out.println("Opprettet muskelgruppe");
+                    } catch (SQLException ex) {
+                        System.out.println("Kunne ikke opprette muskelgruppe");
+                        printException(ex);
+                    }
+                }
+            }
+            if (count == 0) {
+                System.out.println("Ingen muskelgrupper funnet");
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("Could not print");
+            printException(ex);
+        }
+
+
+    }
+
     public static void createOvelse(Statement stmt, Scanner reader){
 
         //Bugfix
@@ -289,10 +339,8 @@ public class Main {
 
         
         try {
-                ResultSet rs = stmt.executeQuery("SELECT * FROM Datdat.ovelse");
-                printOvelse(rs);
-                createOvelse(stmt, reader);
-                System.out.println(rs.toString());
+                ResultSet rs = stmt.executeQuery("SELECT gruppenavn FROM Datdat.gruppe");
+                createGruppe(stmt, reader, rs);
                 System.out.println("works");
 
         } catch (Exception e) {
