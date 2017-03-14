@@ -28,9 +28,9 @@ public class Main {
 
     public static Connection createConnection() {
 
-        String dbURL = "jdbc:mysql://localhost:3306/espenespen?useSSL=false";
+        String dbURL = "jdbc:mysql://localhost:3306/Datdat?useSSL=false";
         String username = "root";
-        String password = "passord";
+        String password = "Eol1234";
 
 
         try {
@@ -86,6 +86,50 @@ public class Main {
 
     }
 
+    public static void createOvelse(Statement stmt, Scanner reader){
+
+        //Bugfix
+        reader.nextLine();
+
+        System.out.println("Tast inn navn på øvelsen");
+        String name = reader.nextLine();
+
+        System.out.println("Hvilken type er øvelsen? (Styrke/Kondisjon)");
+        int type = reader.nextInt();
+
+        String SQL = ("INSERT INTO ovelse (ovelsenavn, treningstype) values ('" + name + "', " + type + ")");
+        //System.out.println(SQL);
+
+        try {
+            System.out.println("Opprettet øvelse");
+            stmt.executeUpdate(SQL);
+        } catch (SQLException ex) {
+            System.out.println("Kunne ikke opprette øvelse");
+            printException(ex);
+        }
+
+    }
+
+    public static void printOvelse(ResultSet ovelse){
+        int count = 0;
+        try {
+            System.out.println("Printing workouts");
+            while(ovelse.next())
+            {
+                ++count;
+                System.out.println(ovelse.getString("ovelsenavn") + " - " + ovelse.getString("treningstype") + " - ");
+            }
+            if (count == 0) {
+                System.out.println("Ingen øvelser funnet");
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("Could not print workouts");
+            printException(ex);
+        }
+
+    }
+
     public static void printMenu() {
         System.out.println("-------------------");
         System.out.println("Velg et alternativ:");
@@ -113,7 +157,10 @@ public class Main {
         Connection conn = createConnection();
         Statement stmt = createStatement(conn);
         try {
-            stmt.execute("SELECT varighet FROM espenespen.treningsokt where oktid = 1");
+            ResultSet rs = stmt.executeQuery("SELECT * FROM Datdat.ovelse");
+            printOvelse(rs);
+            createOvelse(stmt, reader);
+            System.out.println(rs.toString());
             System.out.println("works");
         } catch (SQLException e) {
             System.out.println("Rip");
